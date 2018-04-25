@@ -1,0 +1,14 @@
+button.btn-data + button.btn-data {
+  margin-left: 10px;
+}
+
+.fetch-data,
+.table-data,
+.address-data,
+.searching-form {
+  margin-top: 20px;
+}
+
+.address-data {
+  max-width: 500px;
+}
