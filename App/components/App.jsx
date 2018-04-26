@@ -19,6 +19,13 @@ class App extends React.Component {
     activeButton: '',
     activeRowId: null,
     data: [],
+    tableSort: {
+      id: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+    },
   };
 
   handleBtnLoad = btnType => () => {
@@ -68,25 +75,61 @@ class App extends React.Component {
       const isFiltered = valuesArr.reduce((acc, elem) => (String(elem).includes(searchingValue) ? true : acc), false);
       return isFiltered;
     });
-    if (searchingValue === '') {
-      this.setState({
-        ...this.state,
-        data: this.initialData,
-        activeRowId: null,
-      });
-    } else {
-      this.setState({
-        ...this.state,
-        data: filteredData,
-        activeRowId: null,
-      });
-    }
+
+    this.setState({
+      ...this.state,
+      data: searchingValue === '' ? this.initialData : filteredData,
+      activeRowId: null,
+      tableSort: {
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+      },
+    });
   };
 
   handleRowClick = rowId => () => {
     this.setState({
       ...this.state,
       activeRowId: rowId,
+    });
+  };
+
+  handleThSort = thType => () => {
+    const sortDir = this.state.tableSort[thType] === 'up' ? 'down' : 'up';
+    const unsortedData = [...this.state.data];
+    const sortedData = unsortedData.sort((a, b) => {
+      const prepareValueToCompare = (value) => {
+        if (typeof value === 'number') {
+          return value;
+        }
+        if (typeof value === 'string') {
+          return value.toLowerCase();
+        }
+        return value;
+      };
+
+      if (prepareValueToCompare(a[thType]) < prepareValueToCompare(b[thType])) {
+        return sortDir === 'up' ? -1 : 1;
+      }
+      if (prepareValueToCompare(a[thType]) > prepareValueToCompare(b[thType])) {
+        return sortDir === 'up' ? 1 : -1;
+      }
+      return 0;
+    });
+    this.setState({
+      ...this.state,
+      data: sortedData,
+      tableSort: {
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        [thType]: sortDir,
+      },
     });
   };
 
@@ -106,7 +149,14 @@ class App extends React.Component {
           </div>
         </div>
         <div className="table-data">
-          {this.state.data.length !== 0 ? <Table data={this.state.data} handleRowClick={this.handleRowClick} activeRowId={this.state.activeRowId} /> : null}
+          {this.state.data.length !== 0 ?
+            <Table
+              data={this.state.data}
+              handleRowClick={this.handleRowClick}
+              activeRowId={this.state.activeRowId}
+              handleThSort={this.handleThSort}
+              tableSort={this.state.tableSort}
+            /> : null}
         </div>
         {this.state.activeRowId ? <Info activeRowInfo={activeRowInfo} /> : null}
       </React.Fragment>

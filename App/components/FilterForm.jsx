@@ -12,7 +12,7 @@ export default class extends React.Component {
   render() {
     return (
       <Form inline>
-        <FormControl type="text" value={this.state.inputValue} onChange={this.handleChange} />
+        <FormControl type="text" onChange={this.handleChange} />
         <Button bsStyle="success" type="submit" onClick={this.props.handleBtnSearch(this.state.inputValue)}>Find</Button>
       </Form>
     );

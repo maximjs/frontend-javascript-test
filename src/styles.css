@@ -12,3 +12,14 @@ button.btn-data + button.btn-data {
 .address-data {
   max-width: 500px;
 }
+
+.btn-th {
+  background: none;
+  outline: none;
+  border: none;
+  font-weight: bold;
+}
+
+button.btn-th:hover {
+    background-color: #e6e6e6;
+}
