@@ -49,6 +49,7 @@ class App extends React.Component {
       },
       activeButton: btnType,
     });
+
     axios.get(routes[btnType])
       .then((resp) => {
         this.initialData = resp.data;
