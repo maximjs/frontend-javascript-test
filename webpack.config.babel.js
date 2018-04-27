@@ -5,7 +5,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 export default () => ({
   devtool: 'inline-source-map',
   entry: {
-    app: ['./app/index.js'],
+    app: ['./app'],
   },
   output: {
     library: 'WebpackPackage',
