@@ -1,6 +1,7 @@
 /* eslint object-curly-newline: ["error", "never"] */
 import React from 'react';
 import classnames from 'classnames';
+import uid from 'uid-safe';
 import { Table } from 'react-bootstrap';
 
 export default (props) => {
@@ -15,7 +16,7 @@ export default (props) => {
   const tbody = data.map(({ id, firstName, lastName, email, phone }) => {
     const trClass = classnames({ 'table-active': activeRowId === id });
     return (
-      <tr key={id} className={trClass} onClick={handleRowClick(id)}>
+      <tr key={uid.sync(10)} className={trClass} onClick={handleRowClick(id)}>
         <td>{id}</td>
         <td>{firstName}</td>
         <td>{lastName}</td>

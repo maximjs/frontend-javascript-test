@@ -5,6 +5,9 @@ import routes from '../routes';
 import Table from './Table';
 import Info from './Info';
 import FilterForm from './FilterForm';
+import Pagination from './Pagination';
+
+const getFirstPageData = data => (data.length <= 50 ? [...data] : data.slice(0, 50));
 
 class App extends React.Component {
   state = {
@@ -18,13 +21,18 @@ class App extends React.Component {
     },
     activeButton: '',
     activeRowId: null,
-    data: [],
+    preparingData: [],
+    renderingData: [],
     tableSort: {
       id: '',
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
+    },
+    pagination: {
+      pages: 0,
+      activePage: 1,
     },
   };
 
@@ -54,7 +62,13 @@ class App extends React.Component {
             isLoading: false,
             isDisable: false,
           },
-          data: this.initialData,
+          activeRowId: null,
+          preparingData: [...this.initialData],
+          renderingData: getFirstPageData(this.initialData),
+          pagination: {
+            pages: Math.ceil(this.initialData.length / 50),
+            activePage: 1,
+          },
         });
       })
       .catch(error => console.error(error));
@@ -75,10 +89,10 @@ class App extends React.Component {
       const isFiltered = valuesArr.reduce((acc, elem) => (String(elem).includes(searchingValue) ? true : acc), false);
       return isFiltered;
     });
-
     this.setState({
       ...this.state,
-      data: searchingValue === '' ? this.initialData : filteredData,
+      preparingData: searchingValue === '' ? [...this.initialData] : filteredData,
+      renderingData: searchingValue === '' ? getFirstPageData(this.initialData) : getFirstPageData(filteredData),
       activeRowId: null,
       tableSort: {
         id: '',
@@ -86,6 +100,10 @@ class App extends React.Component {
         lastName: '',
         email: '',
         phone: '',
+      },
+      pagination: {
+        pages: Math.ceil(filteredData.length / 50),
+        activePage: 1,
       },
     });
   };
@@ -99,7 +117,7 @@ class App extends React.Component {
 
   handleThSort = thType => () => {
     const sortDir = this.state.tableSort[thType] === 'up' ? 'down' : 'up';
-    const unsortedData = [...this.state.data];
+    const unsortedData = [...this.state.preparingData];
     const sortedData = unsortedData.sort((a, b) => {
       const prepareValueToCompare = (value) => {
         if (typeof value === 'number') {
@@ -121,7 +139,9 @@ class App extends React.Component {
     });
     this.setState({
       ...this.state,
-      data: sortedData,
+      preparingData: sortedData,
+      renderingData: getFirstPageData(sortedData),
+      activeRowId: null,
       tableSort: {
         id: '',
         firstName: '',
@@ -130,11 +150,37 @@ class App extends React.Component {
         phone: '',
         [thType]: sortDir,
       },
+      pagination: {
+        ...this.state.pagination,
+        activePage: 1,
+      },
+    });
+  };
+
+  handlePageClick = index => () => {
+    const prepData = this.state.preparingData;
+    if (prepData.length / 50 <= 1) {
+      this.setState({
+        ...this.state,
+        renderingData: [...prepData],
+      });
+    }
+    const firstArrayIndex = 50 * (index - 1);
+    const lastArrayIndex = (50 * index) - 1;
+    const renderingData = prepData.slice(firstArrayIndex, lastArrayIndex + 1);
+    this.setState({
+      ...this.state,
+      renderingData,
+      activeRowId: null,
+      pagination: {
+        ...this.state.pagination,
+        activePage: index,
+      },
     });
   };
 
   render() {
-    const activeRowInfo = this.state.data.find(el => el.id === this.state.activeRowId);
+    const activeRowInfo = this.state.renderingData.find(el => el.id === this.state.activeRowId);
     return (
       <React.Fragment>
         <div className="fetch-data">
@@ -149,16 +195,25 @@ class App extends React.Component {
           </div>
         </div>
         <div className="table-data">
-          {this.state.data.length !== 0 ?
+          {this.state.renderingData.length !== 0 ?
             <Table
-              data={this.state.data}
+              data={this.state.renderingData}
               handleRowClick={this.handleRowClick}
               activeRowId={this.state.activeRowId}
               handleThSort={this.handleThSort}
               tableSort={this.state.tableSort}
             /> : null}
+          <div className="pagination">
+            <Pagination
+              pages={this.state.pagination.pages}
+              activePage={this.state.pagination.activePage}
+              handlePageClick={this.handlePageClick}
+            />
+          </div>
         </div>
-        {this.state.activeRowId ? <Info activeRowInfo={activeRowInfo} /> : null}
+        <div className="address-data">
+          {this.state.activeRowId ? <Info activeRowInfo={activeRowInfo} /> : null}
+        </div>
       </React.Fragment>
     );
   }
