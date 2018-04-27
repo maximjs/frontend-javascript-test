@@ -16,11 +16,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maximjs/"
+    "url": "https://github.com/maximjs/frontend-javascript-test"
   },
   "author": "Maxim Kozlyakov",
   "license": "ISC",
-  "homepage": "",
+  "homepage": "https://gentle-forest-30372.herokuapp.com/",
   "dependencies": {
     "axios": "*",
     "babel-cli": "*",
